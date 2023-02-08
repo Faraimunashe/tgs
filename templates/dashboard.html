@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="pagetitle">
+    <h1>Dashboard</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/dashboard">Home</a></li>
+            <li class="breadcrumb-item active">Dashboard</li>
+        </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<section class="section dashboard">
+    <div class="row">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    {{messages[0]}}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Upload Tobacco Leaf</h5>
+              <form action="/grade" method="POST" enctype="multipart/form-data">
+                <div class="row mb-3">
+                  <label for="inputNumber" class="col-sm-2 col-form-label">Image</label>
+                  <div class="col-sm-10">
+                    <input class="form-control" type="file" name="file1" id="formFile" required>
+                  </div>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary">Grade</button>
+                  </div>
+                </div>
+
+              </form><!-- End General Form Elements -->
+
+            </div>
+          </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
