@@ -1,10 +1,11 @@
-from flask import Flask, jsonify, request, redirect, render_template, url_for, flash, g
+from flask import Flask, jsonify, request, redirect, render_template, url_for, flash, session
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import os
+from seg import grader
 
 
 # You can change this to any folder on your system
@@ -77,7 +78,7 @@ def index():
             return redirect(url_for('login'))
         if check_password_hash(user.password, password):
             login_user(user)
-            g = user
+            session['userid'] = user.id
             return redirect(url_for('dashboard'))
 
         flash('Invalid login details.')
@@ -139,13 +140,20 @@ def grade():
     path = os.path.join("static/graded", str(ct.timestamp()) +"."+ extension)
     file1.save(path)
 
-    # new_tobacco = Tobacco(user_id=g.id, leaf=path, grade="grade 0")
-    # db.session.add(new_tobacco)
+    graded = grader(path=path)
+    new_tobacco = Tobacco(user_id=session['userid'], leaf=path, grade=graded, created_at=ct)
+    db.session.add(new_tobacco)
 
-    # db.session.commit()
-    flash('Successfully sent image for grading!')
+    db.session.commit()
+    flash('Image graded as!'+graded)
     return redirect(url_for('dashboard'))
 
+
+@app.route('/statistics', methods=['GET'])
+@login_required
+def statistics():
+    grades = Tobacco.query.all()
+    return render_template('statistics.html', grades=grades)
 
 @app.route('/logout', methods=['GET'])
 @login_required
